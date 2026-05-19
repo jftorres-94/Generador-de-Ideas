@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IdeaGen — Generador de Ideas para Creadores</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080810;
+  --surface: #11111c;
+  --surface2: #1a1a28;
+  --surface3: #22222f;
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.14);
+  --accent: #ff5c35;
+  --accent2: #ff8c6b;
+  --text: #ede9e0;
+  --text2: #a09ea8;
+  --text3: #5e5c68;
+  --card-bg: #13131e;
+  --tag-orange-bg: rgba(255,92,53,0.13);
+  --tag-orange: #ff7a54;
+  --tag-purple-bg: rgba(140,100,255,0.12);
+  --tag-purple: #b09cff;
+  --success: #2dd4a0;
+  --gold: #f5c842;
+  --gold-bg: rgba(245,200,66,0.1);
+  --red: #ff6b6b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 35% at 85% 8%, rgba(255,92,53,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 45% at 8% 92%, rgba(120,90,255,0.05) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 5rem;
+}
+
+header { text-align: center; margin-bottom: 3rem; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--tag-orange-bg);
+  border: 1px solid rgba(255,92,53,0.22);
+  border-radius: 100px;
+  padding: 5px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tag-orange);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.6)} }
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  margin-bottom: 1rem;
+}
+
+h1 em { color: var(--accent); font-style: normal; }
+
+.subtitle {
+  color: var(--text2);
+  font-size: 1rem;
+  font-weight: 300;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.api-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.api-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.api-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.api-desc a { color: var(--tag-orange); text-decoration: none; font-weight: 500; }
+.api-desc a:hover { text-decoration: underline; }
+
+.api-input-row { display: flex; gap: 10px; align-items: center; }
+
+input[type="password"], input[type="text"], select, textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  padding: 11px 15px;
+  outline: none;
+  transition: border-color .2s;
+  width: 100%;
+}
+
+input:focus, select:focus { border-color: rgba(255,92,53,.4); }
+select option { background: #1a1a28; }
+
+.btn-save {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 20px;
+  white-space: nowrap;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.btn-save:hover { border-color: rgba(255,92,53,.3); color: var(--text); }
+.btn-save.saved { color: var(--success); border-color: rgba(45,212,160,.3); }
+
+.api-saved-msg {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--success);
+  margin-top: 10px;
+}
+.api-saved-msg.visible { display: flex; }
+
+.stats-bar {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.stats-bar.visible { display: flex; }
+
+.stat {
+  flex: 1;
+  text-align: center;
+  padding: .9rem 1rem;
+  border-right: 1px solid var(--border);
+}
+.stat:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: .05em;
+  color: var(--accent);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-top: 2px;
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+@media(max-width:560px){ .form-row{ grid-template-columns:1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.nicho-input {
+  font-size: 15px !important;
+  padding: 14px 18px !important;
+  border-radius: 12px !important;
+}
+
+.error-msg {
+  display: none;
+  background: rgba(255,80,80,.08);
+  border: 1px solid rgba(255,80,80,.2);
+  border-radius: 10px;
+  color: #ff8080;
+  font-size: 13px;
+  padding: 12px 16px;
+  margin-top: 14px;
+}
+.error-msg.visible { display: block; }
+
+.generate-btn {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: .08em;
+  padding: 17px 24px;
+  margin-top: 16px;
+  transition: all .2s;
+}
+.generate-btn:hover { background: #ff6e47; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(255,92,53,.3); }
+.generate-btn:active { transform: none; }
+.generate-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.loader { display: none; text-align: center; padding: 3.5rem 1rem; }
+.loader.visible { display: block; }
+
+.loader-ring {
+  width: 44px; height: 44px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  animation: spin .75s linear infinite;
+}
+@keyframes spin { to{ transform:rotate(360deg); } }
+
+.loader p { color: var(--text2); font-size: 14px; }
+.loader .tip { color: var(--tag-orange); font-size: 12px; margin-top: 6px; }
+
+.results { display: none; }
+.results.visible { display: block; }
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.results-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: .05em;
+}
+.results-meta { color: var(--text2); font-size: 12px; margin-top: 2px; }
+
+.btn-regen {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+  transition: all .2s;
+}
+.btn-regen:hover { border-color: var(--border-hover); color: var(--text); }
+
+.ideas-grid { display: grid; gap: 12px; }
+
+.idea-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem 1.4rem;
+  transition: border-color .25s, background .25s;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp .4s forwards;
+}
+.idea-card:hover { border-color: rgba(255,92,53,.2); background: #171722; }
+@keyframes fadeUp { to{ opacity:1; transform:translateY(0); } }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.card-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: .08em;
+  color: var(--accent);
+  min-width: 26px;
+  padding-top: 3px;
+  flex-shrink: 0;
+}
+
+.card-titulo {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.card-actions { display: flex; gap: 7px; flex-shrink: 0; }
+
+.btn-icon {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 15px;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.btn-icon.fav:hover { border-color: rgba(245,200,66,.35); color: var(--gold); }
+.btn-icon.fav.active { background: var(--gold-bg); border-color: rgba(245,200,66,.4); color: var(--gold); }
+.btn-icon.copy:hover { border-color: rgba(45,212,160,.3); color: var(--success); }
+.btn-icon.copy.copied { background: rgba(45,212,160,.1); border-color: rgba(45,212,160,.35); color: var(--success); }
+
+.card-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+
+.tag {
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 11px;
+  letter-spacing: .04em;
+}
+.tag.tipo { background: var(--tag-purple-bg); color: var(--tag-purple); }
+
+.card-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+@media(max-width:500px){ .card-detail{ grid-template-columns:1fr; } }
+
+.detail-block {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 10px 13px;
+}
+.detail-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 5px;
+}
+.detail-text { font-size: 13px; color: var(--text2); line-height: 1.55; }
+
+.script-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--text3);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 13px;
+  margin-top: 10px;
+  width: 100%;
+  text-align: left;
+  transition: all .2s;
+}
+.script-toggle:hover { border-color: rgba(255,92,53,.25); color: var(--tag-orange); }
+.script-toggle .arrow { margin-left: auto; font-size: 10px; transition: transform .2s; }
+.script-toggle.open .arrow { transform: rotate(180deg); }
+
+.script-body {
+  display: none;
+  margin-top: 9px;
+  background: var(--surface2);
+  border: 1px solid rgba(255,92,53,.1);
+  border-radius: 10px;
+  padding: 14px 15px;
+}
+.script-body.visible { display: block; }
+.script-body p {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.script-loading {
+  font-size: 12px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.script-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+
+.favs-section { display: none; margin-top: 2.5rem; }
+.favs-section.visible { display: block; }
+
+.favs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.favs-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: .05em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.favs-badge {
+  background: var(--gold-bg);
+  border: 1px solid rgba(245,200,66,.25);
+  border-radius: 100px;
+  color: var(--gold);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+}
+
+.btn-clear {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text3);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  padding: 7px 13px;
+  transition: all .2s;
+}
+.btn-clear:hover { border-color: rgba(255,80,80,.3); color: var(--red); }
+
+.favs-list { display: grid; gap: 9px; }
+
+.fav-item {
+  background: var(--surface);
+  border: 1px solid rgba(245,200,66,.12);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fadeUp .3s forwards;
+}
+
+.fav-star { color: var(--gold); font-size: 14px; flex-shrink: 0; }
+
+.fav-titulo {
+  font-size: 13px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-fav-copy {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text3);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 13px;
+  transition: all .2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-fav-copy:hover { border-color: rgba(45,212,160,.3); color: var(--success); }
+
+.btn-remove-fav {
+  background: transparent;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 6px;
+  transition: color .2s;
+  flex-shrink: 0;
+}
+.btn-remove-fav:hover { color: var(--red); }
+
+footer { text-align: center; margin-top: 4rem; color: var(--text3); font-size: 12px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <header>
+    <div class="badge"><div class="badge-dot"></div>Powered by IA</div>
+    <h1>Genera ideas<br>que <em>conectan</em></h1>
+    <p class="subtitle">Escribe tu nicho y obtén 10 ideas de videos listas para grabar.</p>
+  </header>
+
+  <!-- API KEY -->
+  <div class="api-section">
+    <div class="api-title">🔑 Clave de acceso a la IA (API Key)</div>
+    <div class="api-desc">
+      Esta app usa inteligencia artificial para generar tus ideas. Para activarla necesitas una <strong>API Key gratuita de Anthropic</strong>:<br>
+      1. Ve a <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> y crea una cuenta gratuita.<br>
+      2. En el menú, entra a <strong>"API Keys"</strong> y crea una nueva clave.<br>
+      3. Cópiala y pégala aquí abajo. Tu clave solo funciona en tu dispositivo — nadie más tiene acceso a ella.
+    </div>
+    <div class="api-input-row">
+      <input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza con sk-ant-api…)" />
+      <button class="btn-save" id="saveKeyBtn" onclick="saveKey()">Guardar</button>
+    </div>
+    <div class="api-saved-msg" id="apiSavedMsg">✓ Clave guardada — ya puedes generar ideas</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">Ideas generadas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statSessions">0</div>
+      <div class="stat-label">Sesiones</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statFavs">0</div>
+      <div class="stat-label">Favoritas</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <div class="field">
+      <label>¿Cuál es tu nicho o tema?</label>
+      <input type="text" id="nicho" class="nicho-input" placeholder="Ej: fitness en casa, cocina vegana, finanzas personales, viajes…" />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Plataforma</label>
+        <select id="plataforma">
+          <option value="cualquier plataforma">Cualquiera</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Instagram Reels">Instagram Reels</option>
+          <option value="YouTube Shorts">YouTube Shorts</option>
+          <option value="YouTube (videos largos)">YouTube largo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tono del contenido</label>
+        <select id="tono">
+          <option value="variado">Variado</option>
+          <option value="educativo">Educativo</option>
+          <option value="entretenido">Entretenido</option>
+          <option value="inspiracional">Inspiracional</option>
+          <option value="controversial">Controversial</option>
+        </select>
+      </div>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="generate-btn" id="generateBtn" onclick="generateIdeas()">✦ GENERAR 10 IDEAS</button>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="loader-ring"></div>
+    <p>La IA está pensando en ideas para tu nicho…</p>
+    <p class="tip">Esto tarda solo unos segundos ☕</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+    <div class="results-header">
+      <div>
+        <div class="results-title">Tus 10 ideas ✦</div>
+        <div class="results-meta" id="resultsMeta"></div>
+      </div>
+      <button class="btn-regen" onclick="generateIdeas()">↺ Generar de nuevo</button>
+    </div>
+    <div class="ideas-grid" id="ideasGrid"></div>
+  </div>
+
+  <!-- FAVORITOS -->
+  <div class="favs-section" id="favsSection">
+    <div class="favs-header">
+      <div class="favs-title">
+        ⭐ Mis favoritas
+        <span class="favs-badge" id="favsCount">0</span>
+      </div>
+      <button class="btn-clear" onclick="clearFavs()">Limpiar todo</button>
+    </div>
+    <div class="favs-list" id="favsList"></div>
+  </div>
+
+  <footer>Hecho con ❤️ por <span>JuanFe Torres UGC</span> · Powered by Claude AI</footer>
+
+</div>
+
+<script>
+let apiKey = '';
+let sessionCount = 0;
+let totalIdeas = 0;
+let favs = [];
+let currentIdeas = [];
+
+function saveKey() {
+  const val = document.getElementById('apiKey').value.trim();
+  if (!val) return;
+  apiKey = val;
+  document.getElementById('apiKey').value = '•'.repeat(22);
+  document.getElementById('apiSavedMsg').classList.add('visible');
+  const btn = document.getElementById('saveKeyBtn');
+  btn.classList.add('saved');
+  btn.textContent = '✓ Listo';
+  document.getElementById('statsBar').classList.add('visible');
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 7000);
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+async function generateIdeas() {
+  const nicho = document.getElementById('nicho').value.trim();
+  const plataforma = document.getElementById('plataforma').value;
+  const tono = document.getElementById('tono').value;
+
+  if (!apiKey) { showError('⚠️ Primero guarda tu API Key arriba para poder generar ideas.'); return; }
+  if (!nicho) { showError('⚠️ Escribe tu nicho o tema para continuar.'); return; }
+
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('loader').classList.add('visible');
+
+  const sys = `Eres un estratega de contenido digital experto en videos cortos y UGC. Generas ideas creativas, específicas y listas para ejecutar.
+
+RESPONDE ÚNICAMENTE CON JSON VÁLIDO. Sin texto extra, sin markdown, sin comillas de código.
+
+Formato exacto:
+{
+  "ideas": [
+    {
+      "titulo": "Título ganador con gancho claro",
+      "tipo_video": "Tutorial / Listicle / Historia personal / POV / Reto / Review / Storytime / etc",
+      "gancho": "Primera frase que dirías en los primeros 3 segundos del video",
+      "cta": "Frase final para que el espectador tome acción",
+      "guion_base": "Esquema del video: INTRO: ... | DESARROLLO: ... | CIERRE: ..."
+    }
+  ]
+}
+
+Genera exactamente 10 ideas distintas. Títulos con gancho real. Ganchos poderosos en 3 segundos.`;
+
+  const usr = `Nicho: ${nicho}\nPlataforma: ${plataforma}\nTono: ${tono}\n\nGenera 10 ideas únicas y ejecutables para este creador.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        system: sys,
+        messages: [{ role: 'user', content: usr }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      if (res.status === 401) throw new Error('API Key inválida. Revisa que la hayas copiado completa.');
+      if (res.status === 429) throw new Error('Límite de uso alcanzado. Espera unos minutos e intenta de nuevo.');
+      throw new Error(err?.error?.message || `Error ${res.status}. Intenta de nuevo.`);
+    }
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '';
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch {
+      throw new Error('Respuesta inesperada. Intenta de nuevo.');
+    }
+
+    const ideas = parsed.ideas;
+    if (!ideas?.length) throw new Error('No se recibieron ideas. Intenta de nuevo.');
+
+    currentIdeas = ideas;
+    sessionCount++;
+    totalIdeas += ideas.length;
+    document.getElementById('statTotal').textContent = totalIdeas;
+    document.getElementById('statSessions').textContent = sessionCount;
+
+    renderIdeas(ideas, nicho, plataforma);
+
+  } catch (e) {
+    showError('Error: ' + e.message);
+  } finally {
+    document.getElementById('loader').classList.remove('visible');
+    document.getElementById('generateBtn').disabled = false;
+  }
+}
+
+function renderIdeas(ideas, nicho, plataforma) {
+  const grid = document.getElementById('ideasGrid');
+  grid.innerHTML = '';
+  document.getElementById('resultsMeta').textContent = `${nicho} · ${plataforma}`;
+
+  ideas.forEach((idea, i) => {
+    const isFav = favs.some(f => f.titulo === idea.titulo);
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+    card.style.animationDelay = `${i * 0.055}s`;
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-num">0${i + 1}</div>
+        <div class="card-titulo">${esc(idea.titulo)}</div>
+        <div class="card-actions">
+          <button class="btn-icon fav ${isFav ? 'active' : ''}" title="Guardar en favoritas" data-idx="${i}">★</button>
+          <button class="btn-icon copy" title="Copiar idea completa" data-idx="${i}">⧉</button>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tipo">${esc(idea.tipo_video)}</span>
+      </div>
+      <div class="card-detail">
+        <div class="detail-block">
+          <div class="detail-label">🎬 Gancho de apertura</div>
+          <div class="detail-text">${esc(idea.gancho)}</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">📣 Llamado a la acción</div>
+          <div class="detail-text">${esc(idea.cta)}</div>
+        </div>
+      </div>
+      <button class="script-toggle" data-idx="${i}">
+        📝 Ver desarrollo del guión <span class="arrow">▼</span>
+      </button>
+      <div class="script-body" id="sb-${i}">
+        <p id="st-${i}"></p>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.btn-icon.fav').forEach(btn => {
+    btn.addEventListener('click', () => toggleFav(btn, parseInt(btn.dataset.idx)));
+  });
+  grid.querySelectorAll('.btn-icon.copy').forEach(btn => {
+    btn.addEventListener('click', () => copyIdea(btn, parseInt(btn.dataset.idx)));
+  });
+  grid.querySelectorAll('.script-toggle').forEach(btn => {
+    btn.addEventListener('click', () => toggleScript(btn, parseInt(btn.dataset.idx)));
+  });
+
+  document.getElementById('results').classList.add('visible');
+}
+
+function toggleScript(btn, i) {
+  const body = document.getElementById(`sb-${i}`);
+  const textEl = document.getElementById(`st-${i}`);
+  const isOpen = body.classList.contains('visible');
+
+  if (isOpen) {
+    body.classList.remove('visible');
+    btn.classList.remove('open');
+    return;
+  }
+
+  btn.classList.add('open');
+  body.classList.add('visible');
+
+  if (textEl.textContent.trim()) return;
+
+  const guion = currentIdeas[i]?.guion_base;
+  if (guion) {
+    textEl.textContent = guion;
+    return;
+  }
+
+  textEl.innerHTML = '<span class="script-loading"><span class="script-spinner"></span> Generando guión…</span>';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 350,
+      messages: [{
+        role: 'user',
+        content: `Crea un esquema de guión breve para este video corto, con 3 partes: INTRO, DESARROLLO y CIERRE. Máximo 6 líneas. Texto plano, sin formato especial.\n\nTítulo: ${currentIdeas[i].titulo}\nGancho: ${currentIdeas[i].gancho}`
+      }]
+    })
+  })
+  .then(r => r.json())
+  .then(d => { textEl.textContent = d.content?.[0]?.text || 'No disponible.'; })
+  .catch(() => { textEl.textContent = 'No se pudo cargar. Intenta de nuevo.'; });
+}
+
+function copyIdea(btn, i) {
+  const idea = currentIdeas[i];
+  const txt = `💡 ${idea.titulo}\n📱 Tipo de video: ${idea.tipo_video}\n🎬 Gancho: ${idea.gancho}\n📣 CTA: ${idea.cta}${idea.guion_base ? '\n\n📝 Guión:\n' + idea.guion_base : ''}`;
+  doClipboard(txt, btn);
+}
+
+function doClipboard(txt, btn) {
+  const done = () => {
+    if (btn) {
+      btn.classList.add('copied');
+      btn.textContent = '✓';
+      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 2200);
+    }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done).catch(() => fallback(txt, done));
+  } else { fallback(txt, done); }
+}
+
+function fallback(txt, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); if(cb) cb(); } catch {}
+  document.body.removeChild(ta);
+}
+
+function toggleFav(btn, i) {
+  const idea = currentIdeas[i];
+  const idx = favs.findIndex(f => f.titulo === idea.titulo);
+  if (idx > -1) {
+    favs.splice(idx, 1);
+    btn.classList.remove('active');
+  } else {
+    favs.push(idea);
+    btn.classList.add('active');
+  }
+  document.getElementById('statFavs').textContent = favs.length;
+  renderFavs();
+}
+
+function renderFavs() {
+  const section = document.getElementById('favsSection');
+  const list = document.getElementById('favsList');
+  document.getElementById('favsCount').textContent = favs.length;
+
+  if (!favs.length) { section.classList.remove('visible'); return; }
+  section.classList.add('visible');
+  list.innerHTML = '';
+
+  favs.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'fav-item';
+    item.innerHTML = `
+      <span class="fav-star">★</span>
+      <span class="fav-titulo">${esc(f.titulo)}</span>
+      <button class="btn-fav-copy" data-idx="${i}">Copiar</button>
+      <button class="btn-remove-fav" data-idx="${i}" title="Quitar">✕</button>
+    `;
+    item.querySelector('.btn-fav-copy').addEventListener('click', () => {
+      const fv = favs[i];
+      doClipboard(`💡 ${fv.titulo}\n📱 Tipo: ${fv.tipo_video}\n🎬 Gancho: ${fv.gancho}\n📣 CTA: ${fv.cta}`, null);
+    });
+    item.querySelector('.btn-remove-fav').addEventListener('click', () => removeFav(i));
+    list.appendChild(item);
+  });
+}
+
+function removeFav(i) {
+  favs.splice(i, 1);
+  document.getElementById('statFavs').textContent = favs.length;
+  renderFavs();
+}
+
+function clearFavs() {
+  favs = [];
+  document.getElementById('statFavs').textContent = 0;
+  renderFavs();
+}
+
+document.getElementById('apiKey').addEventListener('keydown', e => { if (e.key === 'Enter') saveKey(); });
+document.getElementById('nicho').addEventListener('keydown', e => { if (e.key === 'Enter') generateIdeas(); });
+</script>
+</body>
+</html>
