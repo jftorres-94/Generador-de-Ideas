@@ -577,22 +577,6 @@ footer span { color: var(--accent); }
     <p class="subtitle">Escribe tu nicho y obtén 10 ideas de videos listas para grabar.</p>
   </header>
 
-  <!-- API KEY -->
-  <div class="api-section">
-    <div class="api-title">🔑 Clave de acceso a la IA (API Key)</div>
-    <div class="api-desc">
-      Esta app usa inteligencia artificial para generar tus ideas. Para activarla necesitas una <strong>API Key gratuita de Anthropic</strong>:<br>
-      1. Ve a <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> y crea una cuenta gratuita.<br>
-      2. En el menú, entra a <strong>"API Keys"</strong> y crea una nueva clave.<br>
-      3. Cópiala y pégala aquí abajo. Tu clave solo funciona en tu dispositivo — nadie más tiene acceso a ella.
-    </div>
-    <div class="api-input-row">
-      <input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza con sk-ant-api…)" />
-      <button class="btn-save" id="saveKeyBtn" onclick="saveKey()">Guardar</button>
-    </div>
-    <div class="api-saved-msg" id="apiSavedMsg">✓ Clave guardada — ya puedes generar ideas</div>
-  </div>
-
   <!-- STATS -->
   <div class="stats-bar" id="statsBar">
     <div class="stat">
@@ -677,23 +661,13 @@ footer span { color: var(--accent); }
 </div>
 
 <script>
-let apiKey = '';
+let apiKey = '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';
 let sessionCount = 0;
 let totalIdeas = 0;
 let favs = [];
 let currentIdeas = [];
 
-function saveKey() {
-  const val = document.getElementById('apiKey').value.trim();
-  if (!val) return;
-  apiKey = val;
-  document.getElementById('apiKey').value = '•'.repeat(22);
-  document.getElementById('apiSavedMsg').classList.add('visible');
-  const btn = document.getElementById('saveKeyBtn');
-  btn.classList.add('saved');
-  btn.textContent = '✓ Listo';
-  document.getElementById('statsBar').classList.add('visible');
-}
+
 
 function showError(msg) {
   const el = document.getElementById('errorMsg');
@@ -713,7 +687,6 @@ async function generateIdeas() {
   const plataforma = document.getElementById('plataforma').value;
   const tono = document.getElementById('tono').value;
 
-  if (!apiKey) { showError('⚠️ Primero guarda tu API Key arriba para poder generar ideas.'); return; }
   if (!nicho) { showError('⚠️ Escribe tu nicho o tema para continuar.'); return; }
 
   document.getElementById('generateBtn').disabled = true;
@@ -977,8 +950,8 @@ function clearFavs() {
   renderFavs();
 }
 
-document.getElementById('apiKey').addEventListener('keydown', e => { if (e.key === 'Enter') saveKey(); });
 document.getElementById('nicho').addEventListener('keydown', e => { if (e.key === 'Enter') generateIdeas(); });
+document.getElementById('statsBar').classList.add('visible');
 </script>
 </body>
 </html>
