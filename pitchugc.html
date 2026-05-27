@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PitchUGC — Consigue marcas con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f5f0;--ink:#1a1814;--ink2:#6b6860;--ink3:#b0aea8;
+  --surface:#ffffff;--surface2:#f0ede8;
+  --border:rgba(26,24,20,0.1);--border2:rgba(26,24,20,0.06);
+  --accent:#1a5c3a;--accent-light:#e8f2ed;
+  --accent2:#c8873a;--accent2-light:#faf0e6;
+  --red:#c0392b;--red-light:#fdf0ee;
+}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;line-height:1.6;}
+body::before{content:'';position:fixed;top:0;right:0;width:40%;height:100%;background:linear-gradient(135deg,transparent 0%,rgba(200,135,58,0.04) 100%);pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:3rem 1.5rem 6rem;}
+
+header{margin-bottom:3.5rem;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin-bottom:1.25rem;}
+.eyebrow-line{width:28px;height:1px;background:var(--ink3);}
+h1{font-family:'Instrument Serif',serif;font-size:clamp(2.4rem,6vw,4rem);font-weight:400;font-style:italic;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin-bottom:.75rem;}
+h1 strong{font-style:normal;font-weight:400;color:var(--accent);}
+.subtitle{font-size:.95rem;color:var(--ink2);font-weight:300;line-height:1.7;max-width:440px;}
+
+.api-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;}
+.api-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.api-title::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.api-desc{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:1rem;}
+.api-desc a{color:var(--accent);text-decoration:none;font-weight:500;}
+.api-desc a:hover{text-decoration:underline;}
+.api-row{display:flex;gap:10px;}
+
+input[type=password],input[type=text],input[type=url],select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s,background .2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:rgba(26,92,58,.4);background:var(--surface);}
+select option{background:var(--surface);}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+
+.btn-save{background:var(--ink);border:none;border-radius:10px;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:11px 20px;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+.btn-save:hover{background:#333;}
+.btn-save.saved{background:var(--accent);}
+
+.api-ok{display:none;align-items:center;gap:6px;font-size:12px;color:var(--accent);margin-top:10px;}
+.api-ok.on{display:flex;}
+
+.form-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:1.5rem;}
+.section-title{font-family:'Instrument Serif',serif;font-size:1.3rem;font-weight:400;color:var(--ink);margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;}
+.section-num{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--ink3);letter-spacing:.08em;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:540px){.grid2{grid-template-columns:1fr;}}
+
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.field:last-child{margin-bottom:0;}
+.field label{font-size:11px;font-weight:500;color:var(--ink2);letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.badge-opt{background:var(--surface2);border-radius:100px;color:var(--ink3);font-size:9px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;}
+.field-hint{font-size:11px;color:var(--ink3);line-height:1.5;margin-top:2px;}
+
+.toggle-field{display:none;animation:fadeIn .25s ease;}
+.toggle-field.on{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+.opt-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:.75rem 1rem;background:var(--surface2);border:1px dashed var(--border);border-radius:10px;margin-bottom:10px;transition:all .2s;font-size:13px;color:var(--ink2);}
+.opt-toggle:hover{border-color:rgba(26,92,58,.3);color:var(--ink);}
+.opt-toggle.active{background:var(--accent-light);border-color:rgba(26,92,58,.25);color:var(--accent);}
+.toggle-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:11px;}
+.opt-toggle.active .toggle-check{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.error-box{display:none;background:var(--red-light);border:1px solid rgba(192,57,43,.2);border-radius:10px;color:var(--red);font-size:13px;padding:12px 16px;margin-bottom:1rem;}
+.error-box.on{display:block;}
+
+.gen-btn{width:100%;background:var(--ink);border:none;border-radius:14px;color:#fff;cursor:pointer;font-family:'Instrument Serif',serif;font-size:1.2rem;font-style:italic;padding:18px 24px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.gen-btn:hover{background:#2a2520;transform:translateY(-1px);box-shadow:0 8px 30px rgba(26,24,20,.15);}
+.gen-btn:active{transform:none;}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+
+.loader{display:none;text-align:center;padding:4rem 1rem;}
+.loader.on{display:block;}
+.loader-ring{width:42px;height:42px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 1.25rem;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader p{color:var(--ink2);font-size:14px;}
+.loader .tip{color:var(--accent);font-size:12px;margin-top:6px;font-style:italic;}
+
+.results{display:none;}
+.results.on{display:block;}
+.results-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.results-title{font-family:'Instrument Serif',serif;font-size:1.6rem;font-weight:400;color:var(--ink);}
+.btn-new{background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;transition:all .2s;}
+.btn-new:hover{border-color:rgba(26,24,20,.2);color:var(--ink);}
+
+.tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+.tab-btn{background:var(--surface2);border:1px solid var(--border);border-radius:100px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:7px 16px;transition:all .2s;}
+.tab-btn.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+
+.pitch-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;animation:fadeIn .3s ease;}
+.pitch-card.on{display:block;}
+.pitch-meta{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.pitch-tone{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:4px 14px;border-radius:100px;}
+.tone-a{background:var(--accent-light);color:var(--accent);}
+.tone-b{background:var(--accent2-light);color:var(--accent2);}
+.tone-c{background:var(--surface2);color:var(--ink2);}
+.pitch-channel{font-size:12px;color:var(--ink3);}
+.pitch-subject-label{font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.pitch-subject{font-family:'Instrument Serif',serif;font-size:1.05rem;color:var(--ink);margin-bottom:1rem;font-style:italic;}
+.pitch-body{font-size:14px;color:var(--ink);line-height:1.8;white-space:pre-wrap;background:var(--surface2);border-radius:10px;padding:1.25rem;border:1px solid var(--border2);}
+.pitch-actions{display:flex;gap:10px;margin-top:1.25rem;flex-wrap:wrap;}
+.btn-copy{background:var(--accent);border:none;border-radius:10px;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:10px 20px;transition:all .2s;}
+.btn-copy:hover{background:#14472d;}
+.btn-copy.copied{background:#666;}
+.btn-copy-sec{background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 18px;transition:all .2s;}
+.btn-copy-sec:hover{border-color:rgba(26,24,20,.2);color:var(--ink);}
+
+.tips-box{background:var(--accent-light);border:1px solid rgba(26,92,58,.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;display:none;}
+.tips-box.on{display:block;}
+.tips-title{font-size:11px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;}
+.tips-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.tips-list li{font-size:13px;color:var(--ink);line-height:1.6;display:flex;align-items:flex-start;gap:8px;}
+.tips-list li::before{content:'→';color:var(--accent);flex-shrink:0;font-size:12px;margin-top:2px;}
+
+footer{text-align:center;margin-top:4rem;color:var(--ink3);font-size:12px;}
+footer span{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow"><span class="eyebrow-line"></span>Para creadores UGC</div>
+    <h1>Consigue marcas<br>con un pitch <strong>que convierte</strong></h1>
+    <p class="subtitle">Ingresa los datos de la marca y recibe 3 versiones de pitch personalizadas, listas para enviar.</p>
+  </header>
+
+  <!-- SECCIÓN 1: TU PERFIL -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">01</span>Tu perfil como creador</div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>Tu nombre o alias</label>
+        <input type="text" id="crNombre" placeholder="Ej: Juan Felipe Torres" />
+      </div>
+      <div class="field">
+        <label>Nicho de contenido</label>
+        <input type="text" id="crNicho" placeholder="Ej: lifestyle, tecnología, cocina" />
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Plataformas donde creas</label>
+        <input type="text" id="crPlats" placeholder="Ej: Instagram, TikTok" />
+      </div>
+      <div class="field">
+        <label>Estilo de contenido</label>
+        <input type="text" id="crEstilo" placeholder="Ej: tutoriales, reviews, vlogs" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Experiencia o logros <span class="badge-opt">Opcional</span></label>
+      <input type="text" id="crExp" placeholder="Ej: 2 años, 8 clientes, 15 videos UGC entregados" />
+      <span class="field-hint">Hace tu pitch más creíble. Si estás empezando puedes omitirlo.</span>
+    </div>
+
+    <div class="opt-toggle" id="togPort" onclick="toggleOpt('Port')">
+      <span class="toggle-check" id="chkPort"></span>
+      <span>Incluir link de portafolio en el pitch</span>
+    </div>
+    <div class="toggle-field" id="fldPort">
+      <div class="field">
+        <label>Link de portafolio</label>
+        <input type="url" id="portafolio" placeholder="https://tu-portafolio.com o link de Drive" />
+      </div>
+    </div>
+
+    <div class="opt-toggle" id="togPrecio" onclick="toggleOpt('Precio')">
+      <span class="toggle-check" id="chkPrecio"></span>
+      <span>Mencionar precio o tarifa en el pitch</span>
+    </div>
+    <div class="toggle-field" id="fldPrecio">
+      <div class="field">
+        <label>Tu tarifa o rango de precio</label>
+        <input type="text" id="precio" placeholder="Ej: desde $150 USD por video, $80–$200 según formato" />
+        <span class="field-hint">Tip: para primer contacto es mejor no incluir precio. Úsalo solo si ya conoces la marca o tu tarifa es competitiva.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: LA MARCA -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">02</span>Sobre la marca</div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>Nombre de la marca</label>
+        <input type="text" id="mNombre" placeholder="Ej: Nike, Café Amor, FitPack" />
+      </div>
+      <div class="field">
+        <label>Producto o servicio principal</label>
+        <input type="text" id="mProducto" placeholder="Ej: ropa deportiva, café orgánico" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Público objetivo de la marca <span class="badge-opt">Opcional</span></label>
+      <input type="text" id="mPublico" placeholder="Ej: mujeres 25–35 que hacen fitness en casa" />
+    </div>
+    <div class="field">
+      <label>Lo que más te gustó o llamó la atención de ellos</label>
+      <textarea id="mLike" placeholder="Ej: me encantó su última campaña, su empaque sostenible, cómo hablan a su comunidad en redes…"></textarea>
+      <span class="field-hint">Este detalle personaliza el pitch y demuestra que investigaste. Es la clave para diferenciarte de otros creadores.</span>
+    </div>
+    <div class="field">
+      <label>Plataforma para el contenido</label>
+      <select id="mPlat">
+        <option value="Instagram Reels">Instagram Reels</option>
+        <option value="TikTok">TikTok</option>
+        <option value="YouTube Shorts">YouTube Shorts</option>
+        <option value="Instagram + TikTok">Instagram + TikTok</option>
+        <option value="cualquier plataforma">Flexible / cualquier plataforma</option>
+      </select>
+    </div>
+
+    <div class="opt-toggle" id="togIdea" onclick="toggleOpt('Idea')">
+      <span class="toggle-check" id="chkIdea"></span>
+      <span>Tengo una idea de contenido para proponer</span>
+    </div>
+    <div class="toggle-field" id="fldIdea">
+      <div class="field">
+        <label>Tu idea de contenido</label>
+        <textarea id="ideaContenido" placeholder="Ej: un vlog de 30 segundos mostrando mi rutina matutina usando el producto de forma auténtica…"></textarea>
+        <span class="field-hint">Si tu idea es básica, la IA la desarrollará y presentará de forma atractiva para la marca.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <button class="gen-btn" id="genBtn" onclick="generarPitch()">✦ Generar mis 3 pitches</button>
+
+  <div class="loader" id="loader">
+    <div class="loader-ring"></div>
+    <p>Analizando la marca y personalizando tu pitch…</p>
+    <p class="tip">Esto tarda solo unos segundos ☕</p>
+  </div>
+
+  <div class="results" id="results">
+    <div class="results-head">
+      <div class="results-title">Tus 3 pitches ✦</div>
+      <button class="btn-new" onclick="resetForm()">← Nuevo pitch</button>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn on" onclick="showTab(0)">01 · Email profesional</button>
+      <button class="tab-btn" onclick="showTab(1)">02 · DM cercano</button>
+      <button class="tab-btn" onclick="showTab(2)">03 · Contacto frío</button>
+    </div>
+
+    <div class="pitch-card on" id="pitch0">
+      <div class="pitch-meta">
+        <span class="pitch-tone tone-a">Profesional</span>
+        <span class="pitch-channel">Para email corporativo o LinkedIn</span>
+      </div>
+      <div class="pitch-subject-label">Asunto del email</div>
+      <div class="pitch-subject" id="subj0">—</div>
+      <div class="pitch-body" id="body0">—</div>
+      <div class="pitch-actions">
+        <button class="btn-copy" onclick="copyPitch('body0',this)">Copiar pitch</button>
+        <button class="btn-copy-sec" onclick="copyText('subj0',this)">Copiar asunto</button>
+      </div>
+    </div>
+
+    <div class="pitch-card" id="pitch1">
+      <div class="pitch-meta">
+        <span class="pitch-tone tone-b">Cercano</span>
+        <span class="pitch-channel">Para DM de Instagram o WhatsApp</span>
+      </div>
+      <div class="pitch-body" id="body1">—</div>
+      <div class="pitch-actions">
+        <button class="btn-copy" onclick="copyPitch('body1',this)">Copiar pitch</button>
+      </div>
+    </div>
+
+    <div class="pitch-card" id="pitch2">
+      <div class="pitch-meta">
+        <span class="pitch-tone tone-c">Breve · Contacto frío</span>
+        <span class="pitch-channel">Primer mensaje para abrir la puerta</span>
+      </div>
+      <div class="pitch-body" id="body2">—</div>
+      <div class="pitch-actions">
+        <button class="btn-copy" onclick="copyPitch('body2',this)">Copiar pitch</button>
+      </div>
+    </div>
+
+    <div class="tips-box" id="tipsBox">
+      <div class="tips-title">Consejos para este pitch</div>
+      <ul class="tips-list" id="tipsList"></ul>
+    </div>
+  </div>
+
+  <footer>Hecho con ❤️ por <span>JuanFe Torres UGC</span> · Powered by Claude AI</footer>
+</div>
+
+<script>
+let apiKey='';
+
+
+
+
+
+function toggleOpt(id){
+  const tog=document.getElementById('tog'+id);
+  const chk=document.getElementById('chk'+id);
+  const fld=document.getElementById('fld'+id);
+  const on=tog.classList.contains('active');
+  tog.classList.toggle('active');
+  chk.textContent=on?'':'✓';
+  fld.classList.toggle('on',!on);
+}
+
+function showErr(msg){
+  const b=document.getElementById('errorBox');
+  b.textContent=msg;b.classList.add('on');
+  setTimeout(()=>b.classList.remove('on'),7000);
+}
+
+function showTab(i){
+  document.querySelectorAll('.pitch-card').forEach((c,j)=>c.classList.toggle('on',i===j));
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('on',i===j));
+}
+
+async function generarPitch(){
+  const nombre=document.getElementById('crNombre').value.trim();
+  const nicho=document.getElementById('crNicho').value.trim();
+  const plats=document.getElementById('crPlats').value.trim();
+  const estilo=document.getElementById('crEstilo').value.trim();
+  const exp=document.getElementById('crExp').value.trim();
+  const portOn=document.getElementById('togPort').classList.contains('active');
+  const port=portOn?document.getElementById('portafolio').value.trim():'';
+  const precioOn=document.getElementById('togPrecio').classList.contains('active');
+  const precio=precioOn?document.getElementById('precio').value.trim():'';
+  const mNombre=document.getElementById('mNombre').value.trim();
+  const mProducto=document.getElementById('mProducto').value.trim();
+  const mPublico=document.getElementById('mPublico').value.trim();
+  const mLike=document.getElementById('mLike').value.trim();
+  const mPlat=document.getElementById('mPlat').value;
+  const ideaOn=document.getElementById('togIdea').classList.contains('active');
+  const idea=ideaOn?document.getElementById('ideaContenido').value.trim():'';
+
+  if(!nombre||!nicho||!mNombre||!mProducto||!mLike){
+    showErr('⚠️ Completa: tu nombre, nicho, nombre de la marca, producto y lo que te gustó de ellos.');return;
+  }
+
+  document.getElementById('genBtn').disabled=true;
+  document.getElementById('results').classList.remove('on');
+  document.getElementById('loader').classList.add('on');
+
+  const sys=`Eres un experto en copywriting y outreach para creadores UGC. Generas pitches altamente personalizados con alta tasa de respuesta.
+
+RESPONDE ÚNICAMENTE CON JSON VÁLIDO. Sin texto extra, sin markdown.
+
+Formato exacto:
+{
+  "pitch_email": {
+    "asunto": "Asunto email (máx 60 caracteres, genera curiosidad)",
+    "cuerpo": "Email formal. Incluye: apertura personalizada con detalle específico de la marca, presentación del creador, propuesta de valor, idea de contenido si aplica, portafolio si aplica, precio si aplica, CTA pidiendo email o llamada. Tono: profesional pero humano. Máx 200 palabras."
+  },
+  "pitch_dm": {
+    "cuerpo": "DM Instagram/WhatsApp. Tono cercano y auténtico. Empieza con algo genuino de la marca. Máx 100 palabras."
+  },
+  "pitch_frio": {
+    "cuerpo": "Primer contacto frío. Máx 4 oraciones. Solo abre la puerta: quién eres, por qué les escribes, pregunta si trabajan con creadores UGC. No vende, busca obtener un email de contacto."
+  },
+  "tips": [
+    "Consejo específico accionable para este pitch y esta marca",
+    "Consejo sobre personalización o seguimiento",
+    "Consejo sobre timing o canal recomendado"
+  ]
+}
+
+Personaliza cada pitch con el nombre real de la marca y los detalles específicos. Deben sonar como escritos por una persona real, no una IA.`;
+
+  const usr=`CREADOR:
+Nombre: ${nombre}
+Nicho: ${nicho}
+Plataformas: ${plats||'Instagram, TikTok'}
+Estilo: ${estilo}
+${exp?'Experiencia: '+exp:''}
+${port?'Portafolio: '+port:''}
+${precio?'Tarifa: '+precio:''}
+
+MARCA:
+Nombre: ${mNombre}
+Producto/servicio: ${mProducto}
+${mPublico?'Público objetivo: '+mPublico:''}
+Lo que le gustó al creador: ${mLike}
+Plataforma objetivo: ${mPlat}
+${idea?'Idea de contenido propuesta: '+idea:''}
+
+Genera los 3 pitches completamente personalizados.`;
+
+  try{
+    const res=await fetch('https://apps-ugc-api.jft1418.workers.dev',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+      },
+      body:JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens:2500,
+        system:sys,
+        messages:[{role:'user',content:usr}]
+      })
+    });
+
+    if(!res.ok){
+      const e=await res.json().catch(()=>({}));
+      if(res.status===401)throw new Error('API Key inválida. Revisa que la hayas copiado completa.');
+      if(res.status===429)throw new Error('Límite de uso alcanzado. Espera unos minutos e intenta de nuevo.');
+      throw new Error(e?.error?.message||e?.error?.type||JSON.stringify(e)||`Error ${res.status}`);
+    }
+
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'';
+    let parsed;
+    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+    catch{throw new Error('Respuesta inesperada. Intenta de nuevo.');}
+
+    document.getElementById('subj0').textContent=parsed.pitch_email?.asunto||'—';
+    document.getElementById('body0').textContent=parsed.pitch_email?.cuerpo||'—';
+    document.getElementById('body1').textContent=parsed.pitch_dm?.cuerpo||'—';
+    document.getElementById('body2').textContent=parsed.pitch_frio?.cuerpo||'—';
+
+    const tips=parsed.tips||[];
+    if(tips.length){
+      const list=document.getElementById('tipsList');
+      list.innerHTML='';
+      tips.forEach(t=>{const li=document.createElement('li');li.textContent=t;list.appendChild(li);});
+      document.getElementById('tipsBox').classList.add('on');
+    }
+
+    showTab(0);
+    document.getElementById('results').classList.add('on');
+    document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+
+  }catch(e){
+    showErr('Error: '+e.message);
+  }finally{
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('genBtn').disabled=false;
+  }
+}
+
+function copyPitch(id,btn){
+  const txt=document.getElementById(id).textContent;
+  doClip(txt,btn);
+}
+
+function copyText(id,btn){
+  const txt=document.getElementById(id).textContent;
+  doClip(txt,btn);
+}
+
+function doClip(txt,btn){
+  const done=()=>{
+    if(!btn)return;
+    const orig=btn.textContent;
+    btn.classList.add('copied');
+    btn.textContent='✓ Copiado';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent=orig;},2200);
+  };
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>fallback(txt,done));
+  }else{fallback(txt,done);}
+}
+
+function fallback(txt,cb){
+  const ta=document.createElement('textarea');
+  ta.value=txt;ta.style.cssText='position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');if(cb)cb();}catch{}
+  document.body.removeChild(ta);
+}
+
+function resetForm(){
+  document.getElementById('results').classList.remove('on');
+  document.getElementById('tipsBox').classList.remove('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+</script>
+</body>
+</html>
