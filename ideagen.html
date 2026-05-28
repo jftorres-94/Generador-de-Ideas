@@ -661,7 +661,7 @@ footer span { color: var(--accent); }
 </div>
 
 <script>
-let apiKey='';
+
 
 
 let sessionCount = 0;
@@ -717,7 +717,7 @@ Genera exactamente 10 ideas distintas. Títulos con gancho real. Ganchos poderos
   const usr = `Nicho: ${nicho}\nPlataforma: ${plataforma}\nTono: ${tono}\n\nGenera 10 ideas únicas y ejecutables para este creador.`;
 
   try {
-    const res = await fetch('https://apps-ugc-api.jft1418.workers.dev', {
+    const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -734,18 +734,14 @@ Genera exactamente 10 ideas distintas. Títulos con gancho real. Ganchos poderos
       const err = await res.json().catch(() => ({}));
       if (res.status === 401) throw new Error('API Key inválida. Revisa que la hayas copiado completa.');
       if (res.status === 429) throw new Error('Límite de uso alcanzado. Espera unos minutos e intenta de nuevo.');
-      throw new Error(err?.error?.message || err?.error?.type || JSON.stringify(err) || `Error ${res.status}`);
+      throw new Error(err?.error?.message || `Error ${res.status}. Intenta de nuevo.`);
     }
 
     const data = await res.json();
     const raw = data.content?.[0]?.text || '';
     let parsed;
     try {
-      var cleanIdea = raw.replace(/```json|```/g, '').trim();
-      cleanIdea = cleanIdea.replace(/“|”|„|‟/g, '"');
-      cleanIdea = cleanIdea.replace(/‘|’|‚|‛/g, "'");
-      cleanIdea = cleanIdea.replace(/[ -	-]/g, ' ');
-      parsed = JSON.parse(cleanIdea);
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
     } catch {
       throw new Error('Respuesta inesperada. Intenta de nuevo.');
     }
@@ -849,7 +845,7 @@ function toggleScript(btn, i) {
 
   textEl.innerHTML = '<span class="script-loading"><span class="script-spinner"></span> Generando guión…</span>';
 
-  fetch('https://apps-ugc-api.jft1418.workers.dev', {
+  fetch('/.netlify/functions/claude', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
