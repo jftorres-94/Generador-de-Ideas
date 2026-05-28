@@ -11,7 +11,7 @@
   --bg:#f7f5f0;--ink:#1a1814;--ink2:#6b6860;--ink3:#b0aea8;
   --surface:#ffffff;--surface2:#f0ede8;--border:rgba(26,24,20,0.1);
   --accent:#1a5c3a;--accent-light:#e8f2ed;--accent2:#c8873a;--accent2-light:#faf0e6;
-  --red:#c0392b;--red-light:#fdf0ee;--gold:#f5c842;--gold-bg:rgba(245,200,66,0.1);
+  --red:#c0392b;--red-light:#fdf0ee;
 }
 body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;line-height:1.6;}
 .wrap{max-width:800px;margin:0 auto;padding:3rem 1.5rem 6rem;}
@@ -41,8 +41,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .toggle-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s;}
 .opt-toggle.active .toggle-check{background:var(--accent);border-color:var(--accent);color:#fff;}
 .toggle-field{display:none;}
-.toggle-field.on{display:block;animation:fadeIn .25s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.toggle-field.on{display:block;}
 .error-box{display:none;background:var(--red-light);border:1px solid rgba(192,57,43,.2);border-radius:10px;color:var(--red);font-size:13px;padding:12px 16px;margin-bottom:1rem;}
 .error-box.on{display:block;}
 .gen-btn{width:100%;background:var(--ink);border:none;border-radius:14px;color:#fff;cursor:pointer;font-family:'Instrument Serif',serif;font-size:1.2rem;font-style:italic;padding:18px 24px;transition:all .2s;}
@@ -57,8 +56,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .results.on{display:block;}
 .results-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;}
 .results-title{font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--ink);}
-.btn-new{background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;transition:all .2s;}
-.btn-new:hover{color:var(--ink);}
+.btn-new{background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;}
 .tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
 .tab-btn{background:var(--surface2);border:1px solid var(--border);border-radius:100px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:7px 16px;transition:all .2s;}
 .tab-btn.on{background:var(--ink);border-color:var(--ink);color:#fff;}
@@ -72,17 +70,16 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .pitch-channel{font-size:12px;color:var(--ink3);}
 .pitch-subject-label{font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
 .pitch-subject{font-family:'Instrument Serif',serif;font-size:1.05rem;color:var(--ink);margin-bottom:1rem;font-style:italic;}
-.pitch-body{font-size:14px;color:var(--ink);line-height:1.8;white-space:pre-wrap;background:var(--surface2);border-radius:10px;padding:1.25rem;border:1px solid rgba(26,24,20,0.06);}
+.pitch-body{font-size:14px;color:var(--ink);line-height:1.8;white-space:pre-wrap;background:var(--surface2);border-radius:10px;padding:1.25rem;}
 .pitch-actions{display:flex;gap:10px;margin-top:1.25rem;flex-wrap:wrap;}
-.btn-copy{background:var(--accent);border:none;border-radius:10px;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:10px 20px;transition:all .2s;}
-.btn-copy:hover{background:#14472d;}
-.btn-copy-sec{background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 18px;transition:all .2s;}
+.btn-copy{background:var(--accent);border:none;border-radius:10px;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:10px 20px;}
+.btn-copy-sec{background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 18px;}
 .tips-box{background:var(--accent-light);border:1px solid rgba(26,92,58,.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;display:none;}
 .tips-box.on{display:block;}
 .tips-title{font-size:11px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;}
 .tips-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
 .tips-list li{font-size:13px;color:var(--ink);line-height:1.6;display:flex;align-items:flex-start;gap:8px;}
-.tips-list li::before{content:'→';color:var(--accent);flex-shrink:0;font-size:12px;margin-top:2px;}
+.tips-list li::before{content:'>';color:var(--accent);flex-shrink:0;font-size:12px;margin-top:2px;}
 footer{text-align:center;margin-top:4rem;color:var(--ink3);font-size:12px;}
 footer span{color:var(--accent);}
 </style>
@@ -92,20 +89,20 @@ footer span{color:var(--accent);}
   <header>
     <div class="eyebrow"><span class="eyebrow-line"></span>Para creadores UGC</div>
     <h1>Consigue marcas<br>con un pitch <strong>que convierte</strong></h1>
-    <p class="subtitle">Ingresa los datos de la marca y recibe 3 versiones de pitch personalizadas, listas para enviar.</p>
+    <p class="subtitle">Completa el formulario y recibe 3 versiones de pitch listas para enviarle a la marca.</p>
   </header>
 
   <div class="form-section">
     <div class="section-title"><span class="section-num">01</span>Tu perfil como creador</div>
     <div class="grid2">
       <div class="field"><label>Tu nombre o alias</label><input type="text" id="crNombre" placeholder="Ej: Juan Felipe Torres"></div>
-      <div class="field"><label>Nicho de contenido</label><input type="text" id="crNicho" placeholder="Ej: lifestyle, tecnología"></div>
+      <div class="field"><label>Nicho de contenido</label><input type="text" id="crNicho" placeholder="Ej: lifestyle, tecnologia"></div>
     </div>
     <div class="grid2">
       <div class="field"><label>Plataformas donde creas</label><input type="text" id="crPlats" placeholder="Ej: Instagram, TikTok"></div>
       <div class="field"><label>Estilo de contenido</label><input type="text" id="crEstilo" placeholder="Ej: tutoriales, reviews"></div>
     </div>
-    <div class="field"><label>Experiencia <span class="badge-opt">Opcional</span></label><input type="text" id="crExp" placeholder="Ej: 2 años, 8 clientes UGC"></div>
+    <div class="field"><label>Experiencia <span class="badge-opt">Opcional</span></label><input type="text" id="crExp" placeholder="Ej: 2 anos, 8 clientes UGC"></div>
 
     <div class="opt-toggle" id="togPort" onclick="toggleOpt('Port')">
       <span class="toggle-check" id="chkPort"></span>
@@ -120,20 +117,20 @@ footer span{color:var(--accent);}
       <span>Mencionar tarifa en el pitch</span>
     </div>
     <div class="toggle-field" id="fldPrecio">
-      <div class="field"><label>Tu tarifa</label><input type="text" id="precio" placeholder="Ej: desde $150 USD por video">
-      <span class="field-hint">Tip: para primer contacto es mejor no incluir precio.</span></div>
+      <div class="field"><label>Tu tarifa</label><input type="text" id="precio" placeholder="Ej: desde 150 USD por video">
+      <span class="field-hint">Para primer contacto es mejor no incluir precio.</span></div>
     </div>
   </div>
 
   <div class="form-section">
     <div class="section-title"><span class="section-num">02</span>Sobre la marca</div>
     <div class="grid2">
-      <div class="field"><label>Nombre de la marca</label><input type="text" id="mNombre" placeholder="Ej: Nike, Café Amor"></div>
+      <div class="field"><label>Nombre de la marca</label><input type="text" id="mNombre" placeholder="Ej: Nike, Cafe Amor"></div>
       <div class="field"><label>Producto o servicio</label><input type="text" id="mProducto" placeholder="Ej: ropa deportiva"></div>
     </div>
-    <div class="field"><label>Público objetivo <span class="badge-opt">Opcional</span></label><input type="text" id="mPublico" placeholder="Ej: mujeres 25-35 fitness"></div>
-    <div class="field"><label>Lo que más te gustó de ellos</label>
-      <textarea id="mLike" placeholder="Ej: me encantó su última campaña, su empaque sostenible..."></textarea>
+    <div class="field"><label>Publico objetivo <span class="badge-opt">Opcional</span></label><input type="text" id="mPublico" placeholder="Ej: mujeres 25-35 fitness"></div>
+    <div class="field"><label>Lo que mas te gusto de ellos</label>
+      <textarea id="mLike" placeholder="Ej: me encanto su ultima campana, su empaque sostenible..."></textarea>
       <span class="field-hint">Este detalle personaliza el pitch. Es clave para diferenciarte.</span>
     </div>
     <div class="field"><label>Plataforma para el contenido</label>
@@ -141,7 +138,7 @@ footer span{color:var(--accent);}
         <option value="Instagram Reels">Instagram Reels</option>
         <option value="TikTok">TikTok</option>
         <option value="YouTube Shorts">YouTube Shorts</option>
-        <option value="Instagram + TikTok">Instagram + TikTok</option>
+        <option value="Instagram y TikTok">Instagram y TikTok</option>
         <option value="cualquier plataforma">Flexible</option>
       </select>
     </div>
@@ -158,7 +155,7 @@ footer span{color:var(--accent);}
   </div>
 
   <div class="error-box" id="errorBox"></div>
-  <button class="gen-btn" id="genBtn" onclick="generarPitch()">✦ Generar mis 3 pitches</button>
+  <button class="gen-btn" id="genBtn" onclick="generarPitch()">Generar mis 3 pitches</button>
 
   <div class="loader" id="loader">
     <div class="loader-ring"></div>
@@ -167,19 +164,19 @@ footer span{color:var(--accent);}
 
   <div class="results" id="results">
     <div class="results-head">
-      <div class="results-title">Tus 3 pitches ✦</div>
-      <button class="btn-new" onclick="resetForm()">← Nuevo pitch</button>
+      <div class="results-title">Tus 3 pitches</div>
+      <button class="btn-new" onclick="resetForm()">Nuevo pitch</button>
     </div>
     <div class="tabs">
-      <button class="tab-btn on" onclick="showTab(0)">01 · Email profesional</button>
-      <button class="tab-btn" onclick="showTab(1)">02 · DM cercano</button>
-      <button class="tab-btn" onclick="showTab(2)">03 · Contacto frío</button>
+      <button class="tab-btn on" onclick="showTab(0)">01 Email profesional</button>
+      <button class="tab-btn" onclick="showTab(1)">02 DM cercano</button>
+      <button class="tab-btn" onclick="showTab(2)">03 Contacto frio</button>
     </div>
     <div class="pitch-card on" id="pitch0">
       <div class="pitch-meta"><span class="pitch-tone tone-a">Profesional</span><span class="pitch-channel">Para email o LinkedIn</span></div>
       <div class="pitch-subject-label">Asunto del email</div>
-      <div class="pitch-subject" id="subj0">—</div>
-      <div class="pitch-body" id="body0">—</div>
+      <div class="pitch-subject" id="subj0">-</div>
+      <div class="pitch-body" id="body0">-</div>
       <div class="pitch-actions">
         <button class="btn-copy" onclick="copyTxt('body0',this)">Copiar pitch</button>
         <button class="btn-copy-sec" onclick="copyTxt('subj0',this)">Copiar asunto</button>
@@ -187,12 +184,12 @@ footer span{color:var(--accent);}
     </div>
     <div class="pitch-card" id="pitch1">
       <div class="pitch-meta"><span class="pitch-tone tone-b">Cercano</span><span class="pitch-channel">Para DM de Instagram o WhatsApp</span></div>
-      <div class="pitch-body" id="body1">—</div>
+      <div class="pitch-body" id="body1">-</div>
       <div class="pitch-actions"><button class="btn-copy" onclick="copyTxt('body1',this)">Copiar pitch</button></div>
     </div>
     <div class="pitch-card" id="pitch2">
-      <div class="pitch-meta"><span class="pitch-tone tone-c">Breve · Contacto frío</span><span class="pitch-channel">Primer mensaje para abrir la puerta</span></div>
-      <div class="pitch-body" id="body2">—</div>
+      <div class="pitch-meta"><span class="pitch-tone tone-c">Breve</span><span class="pitch-channel">Primer mensaje para abrir la puerta</span></div>
+      <div class="pitch-body" id="body2">-</div>
       <div class="pitch-actions"><button class="btn-copy" onclick="copyTxt('body2',this)">Copiar pitch</button></div>
     </div>
     <div class="tips-box" id="tipsBox">
@@ -201,7 +198,7 @@ footer span{color:var(--accent);}
     </div>
   </div>
 
-  <footer>Hecho con ❤️ por <span>JuanFe Torres UGC</span> · Powered by IA</footer>
+  <footer>Hecho con amor por <span>JuanFe Torres UGC</span> powered by IA</footer>
 </div>
 
 <script>
@@ -211,14 +208,13 @@ function toggleOpt(id) {
   var tog = document.getElementById('tog' + id);
   var chk = document.getElementById('chk' + id);
   var fld = document.getElementById('fld' + id);
-  var isOn = tog.classList.contains('active');
-  if (isOn) {
+  if (tog.classList.contains('active')) {
     tog.classList.remove('active');
     chk.textContent = '';
     fld.classList.remove('on');
   } else {
     tog.classList.add('active');
-    chk.textContent = '✓';
+    chk.textContent = 'v';
     fld.classList.add('on');
   }
 }
@@ -233,19 +229,21 @@ function showErr(msg) {
 function showTab(i) {
   var cards = document.querySelectorAll('.pitch-card');
   var btns = document.querySelectorAll('.tab-btn');
-  cards.forEach(function(c, j) { c.classList.toggle('on', i === j); });
-  btns.forEach(function(b, j) { b.classList.toggle('on', i === j); });
+  for (var j = 0; j < cards.length; j++) {
+    if (j === i) { cards[j].classList.add('on'); btns[j].classList.add('on'); }
+    else { cards[j].classList.remove('on'); btns[j].classList.remove('on'); }
+  }
 }
 
 function copyTxt(id, btn) {
   var txt = document.getElementById(id).textContent;
   var orig = btn.textContent;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
+  try {
     navigator.clipboard.writeText(txt).then(function() {
-      btn.textContent = '✓ Copiado';
+      btn.textContent = 'Copiado';
       setTimeout(function() { btn.textContent = orig; }, 2000);
     });
-  } else {
+  } catch(e) {
     var ta = document.createElement('textarea');
     ta.value = txt;
     ta.style.cssText = 'position:fixed;opacity:0;';
@@ -253,7 +251,7 @@ function copyTxt(id, btn) {
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    btn.textContent = '✓ Copiado';
+    btn.textContent = 'Copiado';
     setTimeout(function() { btn.textContent = orig; }, 2000);
   }
 }
@@ -261,7 +259,18 @@ function copyTxt(id, btn) {
 function resetForm() {
   document.getElementById('results').classList.remove('on');
   document.getElementById('tipsBox').classList.remove('on');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo(0, 0);
+}
+
+function limpiarJSON(txt) {
+  var start = txt.indexOf('{');
+  var end = txt.lastIndexOf('}');
+  if (start === -1 || end === -1) return null;
+  var clean = txt.substring(start, end + 1);
+  clean = clean.replace(/[\u201c\u201d\u201e\u201f]/g, '"');
+  clean = clean.replace(/[\u2018\u2019\u201a\u201b]/g, "'");
+  clean = clean.replace(/[\x00-\x09\x0b\x0c\x0e-\x1f\x7f]/g, ' ');
+  return clean;
 }
 
 function generarPitch() {
@@ -283,7 +292,7 @@ function generarPitch() {
   var idea = ideaOn ? document.getElementById('ideaContenido').value.trim() : '';
 
   if (!nombre || !nicho || !mNombre || !mProducto || !mLike) {
-    showErr('Completa: tu nombre, nicho, nombre de la marca, producto y lo que te gustó.');
+    showErr('Completa: tu nombre, nicho, nombre de la marca, producto y lo que te gusto.');
     return;
   }
 
@@ -291,51 +300,78 @@ function generarPitch() {
   document.getElementById('results').classList.remove('on');
   document.getElementById('loader').classList.add('on');
 
-  var sys = 'Eres un experto en copywriting y outreach para creadores de contenido UGC. Tu trabajo es ayudar al CREADOR a contactar marcas de forma efectiva. El creador es quien escribe el pitch y lo envia a la marca para ofrecerle sus servicios de contenido. Los pitches deben estar escritos en primera persona desde el creador hacia la marca. Cada pitch debe: (1) presentar al creador con personalidad y confianza, (2) demostrar que investigaste la marca con un detalle especifico que les gusta, (3) explicar claramente que tipo de contenido UGC puede crear para esa marca y por que encaja con su audiencia, (4) incluir un ejemplo concreto de idea de contenido si aplica, (5) cerrar con un CTA claro pidiendo una respuesta, reunion o que revisen el portafolio. Tono: profesional pero humano, nunca robotico. RESPONDE UNICAMENTE CON JSON VALIDO sin texto extra ni markdown. Formato exacto: {"pitch_email":{"asunto":"asunto corto y atractivo maximo 60 caracteres","cuerpo":"email completo listo para enviar"},"pitch_dm":{"cuerpo":"mensaje para DM de Instagram o WhatsApp maximo 120 palabras tono cercano y autentico"},"pitch_frio":{"cuerpo":"primer contacto muy breve maximo 4 oraciones solo para abrir la puerta y generar interes"},"tips":["consejo especifico accionable para este pitch","consejo sobre seguimiento o timing","consejo sobre personalizacion"]}';
+  var sysPrompt = [
+    'Eres experto en outreach y copywriting para creadores de contenido UGC.',
+    'El creador UGC es quien usa esta app para CONTACTAR marcas y ofrecerles sus servicios.',
+    'Tu tarea: escribir pitches en primera persona, del creador hacia la marca.',
+    'Cada pitch debe: presentar al creador con confianza, mencionar algo especifico que le gusto de la marca,',
+    'explicar que tipo de contenido UGC puede crear y por que encaja con la audiencia de esa marca,',
+    'incluir una propuesta de valor clara, y cerrar con un llamado a la accion concreto.',
+    'Tono: profesional pero humano. Nunca robotico.',
+    'RESPONDE SOLO CON JSON VALIDO. Sin texto extra. Sin markdown.',
+    'Formato: {"pitch_email":{"asunto":"max 60 chars","cuerpo":"email completo"},"pitch_dm":{"cuerpo":"max 120 palabras para DM"},"pitch_frio":{"cuerpo":"max 4 oraciones para primer contacto"},"tips":["consejo1","consejo2","consejo3"]}'
+  ].join(' ');
 
-  var usr = 'CREADOR: ' + nombre + ', nicho: ' + nicho + ', plataformas: ' + (plats || 'Instagram, TikTok') + ', estilo: ' + estilo + (exp ? ', experiencia: ' + exp : '') + (port ? ', portafolio: ' + port : '') + (precio ? ', tarifa: ' + precio : '') + '. MARCA: ' + mNombre + ', producto: ' + mProducto + (mPublico ? ', publico: ' + mPublico : '') + ', lo que le gusto: ' + mLike + ', plataforma: ' + mPlat + (idea ? ', idea propuesta: ' + idea : '') + '. Genera 3 pitches completamente personalizados en espanol.';
+  var userMsg = [
+    'CREADOR: nombre=' + nombre,
+    'nicho=' + nicho,
+    'plataformas=' + (plats || 'Instagram TikTok'),
+    'estilo=' + estilo,
+    exp ? 'experiencia=' + exp : '',
+    port ? 'portafolio=' + port : '',
+    precio ? 'tarifa=' + precio : '',
+    'MARCA: nombre=' + mNombre,
+    'producto=' + mProducto,
+    mPublico ? 'publico=' + mPublico : '',
+    'le gusto=' + mLike,
+    'plataforma objetivo=' + mPlat,
+    idea ? 'idea de contenido=' + idea : '',
+    'Genera 3 pitches en espanol desde el creador hacia la marca.'
+  ].filter(function(s) { return s !== ''; }).join('. ');
+
+  var payload = {
+    model: 'anthropic/claude-3-haiku',
+    max_tokens: 2000,
+    system: sysPrompt,
+    messages: [{ role: 'user', content: userMsg }]
+  };
 
   fetch(WORKER, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'anthropic/claude-3-haiku',
-      max_tokens: 2000,
-      system: sys,
-      messages: [{ role: 'user', content: usr }]
-    })
+    body: JSON.stringify(payload)
   })
   .then(function(res) { return res.json(); })
   .then(function(data) {
-    var raw = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
-    if (!raw) throw new Error('Sin respuesta de la IA. Intenta de nuevo.');
+    var raw = '';
+    if (data.content && data.content[0] && data.content[0].text) {
+      raw = data.content[0].text;
+    }
+    if (!raw) {
+      throw new Error('Sin respuesta de la IA. Intenta de nuevo.');
+    }
 
-    var start = raw.indexOf('{');
-    var end = raw.lastIndexOf('}');
-    if (start === -1 || end === -1) throw new Error('Formato inesperado. Intenta de nuevo.');
-    var clean = raw.substring(start, end + 1);
-    // Limpiar comillas tipograficas de movil
-    clean = clean.replace(/“|”|„|‟/g, '"');
-    clean = clean.replace(/‘|’|‚|‛/g, "'");
-    // Limpiar caracteres de control
-    clean = clean.replace(/[ -	-]/g, ' ');
+    var clean = limpiarJSON(raw);
+    if (!clean) {
+      throw new Error('Formato inesperado. Intenta de nuevo.');
+    }
 
     var parsed = JSON.parse(clean);
 
-    document.getElementById('subj0').textContent = parsed.pitch_email ? parsed.pitch_email.asunto || '—' : '—';
-    document.getElementById('body0').textContent = parsed.pitch_email ? parsed.pitch_email.cuerpo || '—' : '—';
-    document.getElementById('body1').textContent = parsed.pitch_dm ? parsed.pitch_dm.cuerpo || '—' : '—';
-    document.getElementById('body2').textContent = parsed.pitch_frio ? parsed.pitch_frio.cuerpo || '—' : '—';
+    document.getElementById('subj0').textContent = parsed.pitch_email ? (parsed.pitch_email.asunto || '-') : '-';
+    document.getElementById('body0').textContent = parsed.pitch_email ? (parsed.pitch_email.cuerpo || '-') : '-';
+    document.getElementById('body1').textContent = parsed.pitch_dm ? (parsed.pitch_dm.cuerpo || '-') : '-';
+    document.getElementById('body2').textContent = parsed.pitch_frio ? (parsed.pitch_frio.cuerpo || '-') : '-';
 
     var tips = parsed.tips || [];
     if (tips.length) {
       var list = document.getElementById('tipsList');
       list.innerHTML = '';
-      tips.forEach(function(t) {
+      for (var i = 0; i < tips.length; i++) {
         var li = document.createElement('li');
-        li.textContent = t;
+        li.textContent = tips[i];
         list.appendChild(li);
-      });
+      }
       document.getElementById('tipsBox').classList.add('on');
     }
 
