@@ -405,7 +405,7 @@ Genera los 3 pitches completamente personalizados.`;
         'Content-Type':'application/json',
       },
       body:JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens:2500,
         system:sys,
         messages:[{role:'user',content:usr}]
@@ -422,8 +422,14 @@ Genera los 3 pitches completamente personalizados.`;
     const data=await res.json();
     const raw=data.content?.[0]?.text||'';
     let parsed;
-    try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}
-    catch{throw new Error('Respuesta inesperada. Intenta de nuevo.');}
+    try{
+      let clean = raw.replace(/```json|```/g,'').trim();
+      const start = clean.indexOf('{');
+      const end = clean.lastIndexOf('}');
+      if(start !== -1 && end !== -1) clean = clean.substring(start, end+1);
+      parsed = JSON.parse(clean);
+    }
+    catch(e){throw new Error('Respuesta inesperada: ' + raw.substring(0,120));}
 
     document.getElementById('subj0').textContent=parsed.pitch_email?.asunto||'—';
     document.getElementById('body0').textContent=parsed.pitch_email?.cuerpo||'—';
