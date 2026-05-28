@@ -314,6 +314,11 @@ function generarPitch() {
     var end = raw.lastIndexOf('}');
     if (start === -1 || end === -1) throw new Error('Formato inesperado. Intenta de nuevo.');
     var clean = raw.substring(start, end + 1);
+    // Limpiar comillas tipograficas de movil
+    clean = clean.replace(/“|”|„|‟/g, '"');
+    clean = clean.replace(/‘|’|‚|‛/g, "'");
+    // Limpiar caracteres de control
+    clean = clean.replace(/[ -	-]/g, ' ');
 
     var parsed = JSON.parse(clean);
 
