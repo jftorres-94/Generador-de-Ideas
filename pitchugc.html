@@ -429,7 +429,20 @@ Genera los 3 pitches completamente personalizados.`;
       if(start !== -1 && end !== -1) clean = clean.substring(start, end+1);
       parsed = JSON.parse(clean);
     }
-    catch(e){throw new Error('Respuesta inesperada: ' + raw.substring(0,120));}
+    catch(e){
+      // Intentar limpiar saltos de línea dentro de strings JSON
+      try {
+        let clean2 = raw.replace(/```json|```/g,'').trim();
+        const s = clean2.indexOf('{'), en = clean2.lastIndexOf('}');
+        if(s !== -1 && en !== -1) clean2 = clean2.substring(s, en+1);
+        // Reemplazar saltos de línea dentro de strings
+        clean2 = clean2.replace(/[
+]/g, '\n');
+        parsed = JSON.parse(clean2);
+      } catch(e2) {
+        throw new Error('Respuesta inesperada. Intenta de nuevo.');
+      }
+    }
 
     document.getElementById('subj0').textContent=parsed.pitch_email?.asunto||'—';
     document.getElementById('body0').textContent=parsed.pitch_email?.cuerpo||'—';
